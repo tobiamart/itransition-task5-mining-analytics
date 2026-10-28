@@ -1,0 +1,13 @@
+{
+  "name": "wy-mining-analytics",
+  "private": true,
+  "description": "Weyland-Yutani mining output dashboard: statistics, anomaly detection and PDF reports from a Google Sheets generator.",
+  "type": "module",
+  "scripts": {
+    "start": "python -m http.server 5173",
+    "test": "node --test tests/analysis.test.mjs"
+  },
+  "devDependencies": {
+    "jstat": "1.9.6"
+  }
+}
