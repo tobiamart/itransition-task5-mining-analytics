@@ -26,6 +26,9 @@ const pct = (v) => `${v > 0 ? '+' : ''}${(v * 100).toFixed(0)}%`;
 const iso = (d) => d.toISOString().slice(0, 10);
 const esc = (s) => String(s).replace(/[&<>"']/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
 
+// Plain text of an HTML snippet; DOMParser documents are inert (no scripts or event handlers run).
+const textOf = (html) => new DOMParser().parseFromString(String(html), 'text/html').body.textContent;
+
 function sheetIdFrom(text) {
   if (!text) return null;
   const m = text.match(/\/d\/([\w-]{20,})/) || text.match(/^([\w-]{20,})$/);
@@ -56,7 +59,7 @@ function parseCsv(text) {
   if (names[0] !== 'Date') throw new Error('Unexpected layout: the Data tab must start with a Date column.');
   const toNum = (s) => parseFloat(String(s).replace(/[,\s]/g, ''));
   const body = rows.slice(1).filter((r) => /^\d{4}-\d{2}-\d{2}$/.test((r[0] || '').trim()));
-  const columns = {};
+  const columns = Object.create(null);   // header names come from a publicly editable sheet
   names.slice(1).forEach((n) => { columns[n] = []; });
   for (const r of body) keep.slice(1).forEach((j) => columns[header[j]].push(toNum(r[j]) || 0));
   const mines = names.slice(1).filter((n) => n !== 'Total');
@@ -112,7 +115,7 @@ function renderKpis() {
   const drops = result.episodes.length - spikes;
   const tiles = [
     ['Period', `<span class="tile-value-sm">${data.labels[0]} – ${data.labels[data.labels.length - 1]}</span>`, `${data.labels.length} days`],
-    ['Mines', data.mines.length, data.mines.join(', ')],
+    ['Mines', data.mines.length, esc(data.mines.join(', '))],
     ['Total output', `${num(total.stats.sum / 1000, 1)} kt`, 'all mines, whole period'],
     ['Mean daily output', `${num(total.stats.mean, 0)} t`, `std dev ${num(total.stats.sd, 0)} t · median ${num(total.stats.median, 0)} t`],
     ['Anomaly episodes', result.episodes.length, `<i class="bi bi-caret-up-fill"></i> ${spikes} spikes · <i class="bi bi-caret-down-fill"></i> ${drops} drops`],
@@ -121,7 +124,7 @@ function renderKpis() {
     <div class="col"><div class="tile h-100">
       <div class="tile-label">${label}</div>
       <div class="tile-value">${value}</div>
-      <div class="tile-sub" title="${esc(String(sub).replace(/<[^>]+>/g, ''))}">${sub}</div>
+      <div class="tile-sub" title="${esc(textOf(sub))}">${sub}</div>
     </div></div>`).join('');
 }
 
