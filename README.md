@@ -1,7 +1,7 @@
 # Task 5 – Weyland-Yutani mining output: generator and analytics dashboard
 
 - **Generator (Google Sheets, formulas only):** https://docs.google.com/spreadsheets/d/1KxNeW1Ccx1u1V_1ngHKzAD_556bXqVUD2Z66exkqJBo/edit
-- **Dashboard:** see the deployment link in the repository description
+- **Dashboard:** https://wy-mining-analytics.vercel.app
 
 ## Part I – generator
 
